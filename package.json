@@ -1,0 +1,27 @@
+{
+  "name": "eclipsismatchscraper",
+  "version": "1.0.0",
+  "description": "Small project to scrape data from the #matches channel in the eclipsis community server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robigan/EclipsisMatchScraper.git"
+  },
+  "keywords": [
+    "eclipsis",
+    "scrape",
+    "scraper"
+  ],
+  "author": "robigan#1634 and lansraad#7511",
+  "license": "GPLv3",
+  "homepage": "https://github.com/robigan/EclipsisMatchScraper",
+  "dependencies": {
+    "snowtransfer": "github:robigan/SnowTransfer#235f38399937667e5ea32a8a356cc6617cd76c3e"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0"
+  }
+}
