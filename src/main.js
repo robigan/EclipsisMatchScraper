@@ -1,4 +1,4 @@
-const Config = require("./secret.hidden.json");
+const Config = require("../secret.hidden.json");
 const SnowTransfer = new (require("snowtransfer"))(Config.token, {});
 
 (async () => {
