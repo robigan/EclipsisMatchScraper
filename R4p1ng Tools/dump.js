@@ -27,6 +27,14 @@ const PushData = async (Data, Cache) => {
     let Count = 0;
     /** @type {Array.<Array.<{ "id": number, "embeds": Array, "timestamp": Date }>>} */
     let Cache = [];
+    /*try { // Silently crashes, require() actually throws an error
+        Cache = JSON.parse((await fs.readFile(Config.fileName, {"encoding": "utf-8"})).toString());
+        Count = Cache.dump.length / 100;
+        getOptions.before = Cache.beforeOffset;
+        Cache = Cache.data;
+    } catch (err) {
+        console.log("No resumable file found, skipping resume process", err);
+    }*/
     setInterval(async () => {
         const TimeStart = new Date();
         Count += 1;
