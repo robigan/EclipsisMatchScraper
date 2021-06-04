@@ -1,0 +1,4 @@
+{
+    "getOptions" : { "limit": 100 },
+    "fileName": "dump/dump.txt"
+}
