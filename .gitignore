@@ -1,4 +1,3 @@
 *.hidden.*
-node_modules
 .vscode
 *.txt
