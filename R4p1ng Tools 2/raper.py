@@ -12,7 +12,15 @@ def main():
     col = db["matches"]
 
     r = requests.get(config["url"], params=config["getOptions"], headers=config["headers"])
+    data = json.load(r.json())
 
+    massWrite = []
+
+    for message in data:
+        formatted = {
+            "_id": message["id"]
+        }
+        massWrite.append()
 
 if __name__ == "__main__":
     main()
