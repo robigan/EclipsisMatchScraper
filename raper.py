@@ -1,51 +1,42 @@
 import requests
 import json
 from pymongo import MongoClient
-import regex
 
+
+def shave(data):
+    newData = []
+    for Message in data:
+        formatted = {}
+        formatted["id"] = Message["id"]
+        formatted["embeds"] = Message["embeds"]
+        newData.append(formatted)
+    return newData
+
+
+def getData(url, getOptions, headers):
+    r = requests.get(
+        url, params=getOptions, headers=headers)
+    data= r.json()
+    data= shave(data)
+    return data
 
 def main():
     with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:
-        config = json.load(json_file)
+        config= json.load(json_file)
         json_file.close()
 
-    #client = MongoClient(config["conn_url"], serverSelectionTimeoutMS=5000)
-    #db = client['eclipsis-database']
-    #col = db["matches"]
+    client= MongoClient(config["conn_url"], serverSelectionTimeoutMS=5000)
+    db= client['eclipsis-database']
+    col= db["matches"]
 
-    r = requests.get(config["url"], params=config["getOptions"], headers=config["headers"])
-    data = r.json()
+    latest = list(col.find({"_id": {"$gte": "553182269070901259"}}).sort("_id", -1).limit(1))[0]["_id"]
 
-    limit = config["getOptions"]["limit"]
-    success = 0
+    getOptions= config["getOptions"]
+    getOptions["after"]= latest
 
-    Usernames = []
-    Durations = []
-    Ratings = []
+    data= getData(config["url"], getOptions, config["headers"])
 
-    for Match in data:
-        UsernamesInMatch = regex.findall("(?<=:arrow_down: |:arrow_down_small: |:trophy::arrow_up_small: |:trophy::arrow_up: |#:arrow_double_down: |:trophy::arrow_double_up: ).*?(?= [[])", str(Match))
-        DurationInMatch = regex.findall("(?<=\w [[]).*?(?=[]])", str(Match))
-        RatingInMatch = regex.findall("(?<=]: ).*?(?= [-+])", str(Match))
-        if (len(UsernamesInMatch) == len(DurationInMatch) == len(RatingInMatch)):
-            success += 1
-            print(len(UsernamesInMatch), len(DurationInMatch), len(RatingInMatch), " Matched")
-        else:
-            print(len(UsernamesInMatch), len(DurationInMatch), len(RatingInMatch))
-
-    print("Parsing success rate stats: " + str((success / limit) * 100) + str("%"))
-    # Usernames = regex.findall("(?<=:arrow_down: |:arrow_down_small: |:trophy::arrow_up_small: |:trophy::arrow_up: |#:arrow_double_down: |:trophy::arrow_double_up: ).*?(?= [[])", r.text)
-    #Durations = regex.findall("(?<=\w [[]).*?(?=[]])", r.text)
-    #Ratings = regex.findall("(?<=]: ).*?(?= [-+])", r.text)
-
-    #massWrite = []
-
-    # for message in data:
-    # formatted = {
-    # "_id": message["id"]
-    # }
-    # massWrite.append()
-
+    print(data)
 
 if __name__ == "__main__":
     main()
