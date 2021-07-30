@@ -118,8 +118,13 @@ class Scraper:
                 match_data["teams"] = self.get_winners(match) + self.get_losers(match)
 
             except Exception as e:
-                print("Caught Exception: ", e)
-                print("Source: ", match)
+                exception_type, exception_object, exception_traceback = sys.exc_info()
+                filename = exception_traceback.tb_frame.f_code.co_filename
+                line_number = exception_traceback.tb_lineno
+                print("\nCaught Exception!\n")
+                print("Type:", exception_type)
+                print("File name:", filename), 
+                print("Line number: ", line_number)
                 sys.exit(1)
 
             parsed_matches.append(match_data)
