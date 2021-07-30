@@ -90,7 +90,7 @@ class Scraper:
                     "players":  players
                 }
                 teams.append(team)
-            return teams
+        return teams
 
     def scrape(self, matches):
         parsed_matches = []
