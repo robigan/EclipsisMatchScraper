@@ -5,7 +5,10 @@ class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
         format_str = ""                 
         if "h" in time_str:
-            format_str = "%Hh %Mm %Ss"
+            if "m" not in time_str:
+                format_str = "%Hh %Ss"
+            else:
+                format_str = "%Hh %Mm %Ss"
         elif "m" in time_str:
             format_str = "%Mm %Ss"
         else:
