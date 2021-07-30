@@ -58,10 +58,8 @@ def main():  # Main loop
     s = Scraper()
 
     while True:  # While loop to keep recursively updating the db
+        print("Fetching and Scraping...")
         data = getData(config["url"], getOptions, config["headers"])
-        print(chr(27) + "[2J") # clear terminal
-        print("Fetched data")
-
         scraped_msg_count += len(data)
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
@@ -69,7 +67,6 @@ def main():  # Main loop
             exit()
         else:
             # Scrape here the data, and then dump
-            print("Scraping data...")
             data = s.scrape(data)
             print(f"⚠️ Inserting {str(len(data))} matches... [{scraped_msg_count} in total]")
             col.insert_many(data, ordered=False)
