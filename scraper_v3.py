@@ -73,14 +73,19 @@ class Scraper:
                 
                 for i in range(0, len(usernames)):
                     rating_change.append(int(delta_ratings[i]) if len(delta_ratings) > 0 else 0)
+                    
+                    try:
+                        player = {
+                            "username":         usernames[i],
+                            "new_rating":       int(rating[i]) + rating_change[i],
+                            "rating_change":    rating_change[i],
+                            "playtime":         self.parse_time(playtimes[i])
+                        }
+                        players.append(player)
+                    except Exception as e:
+                        print("Caught Exception: ", e)
+                        print("Source: ", field)
 
-                    player = {
-                        "username":         usernames[i],
-                        "new_rating":       int(rating[i]) + rating_change[i],
-                        "rating_change":    rating_change[i],
-                        "playtime":         self.parse_time(playtimes[i])
-                    }
-                    players.append(player)
 
                 team = {
                     "name":     field["name"].replace(":small_red_triangle_down: ", ''),
