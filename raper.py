@@ -1,14 +1,16 @@
+from re import S
 import requests
 import json
 from pymongo import MongoClient
 import time
-
+from scraper_v3 import Scraper
 
 def shave(data):  # Trims returned data
     newData = []
     for Message in data:
         formatted = {}
         formatted["id"] = Message["id"]
+        formatted["timestamp"] = Message["timestamp"]
         formatted["embeds"] = Message["embeds"]
         newData.append(formatted)
     return newData
@@ -30,16 +32,6 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
     return data
 
 
-def format(data):  # Temp function to test out the whole program
-    newData = []
-    for Message in data:
-        formatted = {}
-        formatted["_id"] = Message["id"]
-        formatted["embeds"] = Message["embeds"]
-        newData.append(formatted)
-    return newData
-
-
 def main():  # Main loop
     with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
         config = json.load(json_file)
@@ -48,7 +40,7 @@ def main():  # Main loop
     # Gets the target collection of the db
     client = MongoClient(config["conn_url"], serverSelectionTimeoutMS=5000)
     db = client['eclipsis-database']
-    col = db["matches_test"]
+    col = db["matches"]
 
     latest = list(col.find({"_id": {"$gte": "553182269070901259"}}).sort(
         "_id", -1).limit(1))  # Gets the after offset
@@ -60,6 +52,8 @@ def main():  # Main loop
     getOptions = config["getOptions"]
     getOptions["after"] = latest
 
+    s = Scraper()
+
     while True:  # While loop to keep recursively updating the db
         print("Scraping & raping")
         data = getData(config["url"], getOptions, config["headers"])
@@ -69,12 +63,11 @@ def main():  # Main loop
             break
         else:
             # Scrape here the data, and then dump
-            data = format(data)
-            print("Inserting...")
+            data = s.scrape(data)
+            print("Inserting " + str(len(data)) + " matches...")
             col.insert_many(data, ordered=False)
             getOptions["after"] = data[0]["_id"]
         print("\n")
-
 
 if __name__ == "__main__":
     main()

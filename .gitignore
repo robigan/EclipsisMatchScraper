@@ -1,3 +1,4 @@
 *.hidden.*
 .vscode
 *.txt
+__pycache__/**
