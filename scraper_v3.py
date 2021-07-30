@@ -127,6 +127,7 @@ class Scraper:
                 print("File name:", filename), 
                 print("Line number: ", line_number, "\n")
                 traceback.print_tb(e.__traceback__)
+                print("\nMatch Data:", match), 
                 sys.exit(1)
 
             parsed_matches.append(match_data)
