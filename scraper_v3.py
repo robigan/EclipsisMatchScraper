@@ -104,7 +104,7 @@ class Scraper:
 
             match_data = {
                 "_id": match["id"],
-                "date": datetime.strptime(match["timestamp"], '%Y-%m-%dT%H:%M:%S.%f+00:00'),
+                "date": datetime.strptime(match["timestamp"], '%Y-%m-%dT%H:%M:%S+00:00'),
                 "match_time": self.parse_time(match_time),
                 "match_type": match_type
             }
