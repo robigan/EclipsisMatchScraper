@@ -1,6 +1,7 @@
 from datetime import datetime   # Used for date / time conversions
 import regex
 import sys
+import traceback
 
 class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
@@ -124,8 +125,8 @@ class Scraper:
                 print("\nCaught Exception!\n")
                 print("Type:", exception_type)
                 print("File name:", filename), 
-                print("Line number: ", line_number)
-                print(f"\n{e.__traceback__}")
+                print("Line number: ", line_number, "\n")
+                traceback.print_tb(e.__traceback__)
                 sys.exit(1)
 
             parsed_matches.append(match_data)
