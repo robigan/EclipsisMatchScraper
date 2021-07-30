@@ -64,7 +64,7 @@ def main():  # Main loop
         scraped_msg_count += str(len(data))
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
-            print("❌ Database contains scraped data, exiting...")
+            print("❌ Database contains newly scraped data, exiting...")
             exit()
         else:
             # Scrape here the data, and then dump
