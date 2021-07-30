@@ -62,7 +62,7 @@ def main():  # Main loop
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
             print("Database contains gotten data, exiting...")
-            break
+            exit(0)
         else:
             # Scrape here the data, and then dump
             data = s.scrape(data)
