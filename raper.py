@@ -61,7 +61,7 @@ def main():  # Main loop
         print(chr(27) + "[2J") # clear terminal
         print("Fetching data...")
         data = getData(config["url"], getOptions, config["headers"])
-        scraped_msg_count += str(len(data))
+        scraped_msg_count += len(data)
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
             print("❌ Database contains newly scraped data, exiting...")
