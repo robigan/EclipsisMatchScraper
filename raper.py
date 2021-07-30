@@ -1,9 +1,10 @@
 import requests
 import json
 from pymongo import MongoClient
+import time
 
 
-def shave(data):
+def shave(data):  # Trims returned data
     newData = []
     for Message in data:
         formatted = {}
@@ -13,30 +14,67 @@ def shave(data):
     return newData
 
 
-def getData(url, getOptions, headers):
-    r = requests.get(
-        url, params=getOptions, headers=headers)
-    data= r.json()
-    data= shave(data)
+def getData(url, getOptions, headers):  # Gets a trimmed down version of the data
+    data = {}
+    while True:
+        r = requests.get(
+            url, params=getOptions, headers=headers)
+        time.sleep(2.5)
+        decoded = r.json()
+        if r.status_code == 429:
+            print("Getting ratelimited, ratelimit retry_after is " + str(decoded.retry_after))
+            time.sleep(decoded.retry_after + 5)
+        else:
+            data = shave(decoded)
+            break
     return data
 
-def main():
-    with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:
-        config= json.load(json_file)
+
+def format(data):  # Temp function to test out the whole program
+    newData = []
+    for Message in data:
+        formatted = {}
+        formatted["_id"] = Message["id"]
+        formatted["embeds"] = Message["embeds"]
+        newData.append(formatted)
+    return newData
+
+
+def main():  # Main loop
+    with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
+        config = json.load(json_file)
         json_file.close()
 
-    client= MongoClient(config["conn_url"], serverSelectionTimeoutMS=5000)
-    db= client['eclipsis-database']
-    col= db["matches"]
+    # Gets the target collection of the db
+    client = MongoClient(config["conn_url"], serverSelectionTimeoutMS=5000)
+    db = client['eclipsis-database']
+    col = db["matches_test"]
 
-    latest = list(col.find({"_id": {"$gte": "553182269070901259"}}).sort("_id", -1).limit(1))[0]["_id"]
+    latest = list(col.find({"_id": {"$gte": "553182269070901259"}}).sort(
+        "_id", -1).limit(1))  # Gets the after offset
+    if len(latest) == 0:
+        latest = "553180587528290316"
+    else:
+        latest = latest[0]["_id"]
 
-    getOptions= config["getOptions"]
-    getOptions["after"]= latest
+    getOptions = config["getOptions"]
+    getOptions["after"] = latest
 
-    data= getData(config["url"], getOptions, config["headers"])
+    while True:  # While loop to keep recursively updating the db
+        print("Scraping & raping")
+        data = getData(config["url"], getOptions, config["headers"])
+        # If the db contains the returned data, then exit
+        if col.find_one({"_id": data[0]["id"]}) != None:
+            print("Database contains gotten data, exiting...")
+            break
+        else:
+            # Scrape here the data, and then dump
+            data = format(data)
+            print("Inserting...")
+            col.insert_many(data, ordered=False)
+            getOptions["after"] = data[0]["_id"]
+        print("\n")
 
-    print(data)
 
 if __name__ == "__main__":
     main()
