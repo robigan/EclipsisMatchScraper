@@ -24,7 +24,7 @@ class Scraper:
         return regex.findall("(?<=:arrow_down: |:arrow_down_small: |:trophy::arrow_up_small: |:trophy::arrow_up: |:arrow_double_down: |:trophy::arrow_double_up: |:regional_indicator_o: ).*?(?= [[])", str(source))
 
     def get_playtimes(self, source):
-        return regex.findall("(?<=\w [[]).*?(?=[]])", str(source))
+        return regex.findall("(?<=[\w| ] [[]).*?(?=[]])", str(source))
     
     def get_ratings(self, source):
         return regex.findall("(?<=]: ).*?(?= [-+]|\W)", str(source)) 
