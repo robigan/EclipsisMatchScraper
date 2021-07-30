@@ -36,7 +36,7 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
 
 def main():  # Main loop
     scraped_msg_count = 0
-    with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
+    with open("/root/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
         config = json.load(json_file)
         json_file.close()
 
