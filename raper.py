@@ -3,7 +3,6 @@ import json
 from pymongo import MongoClient
 import time
 from scraper_v3 import Scraper
-import os
 
 def shave(data):  # Trims returned data
     newData = []
@@ -37,7 +36,7 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
 
 def main():  # Main loop
     scraped_msg_count = 0
-    with open(os.getcwd() + "/secret.hidden.json") as json_file:  # Get config file
+    with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
         config = json.load(json_file)
         json_file.close()
 
@@ -59,9 +58,10 @@ def main():  # Main loop
     s = Scraper()
 
     while True:  # While loop to keep recursively updating the db
-        print(chr(27) + "[2J") # clear terminal
-        print("Fetching data...")
         data = getData(config["url"], getOptions, config["headers"])
+        print(chr(27) + "[2J") # clear terminal
+        print("Fetched data")
+
         scraped_msg_count += len(data)
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
