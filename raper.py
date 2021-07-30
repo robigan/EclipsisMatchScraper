@@ -68,7 +68,7 @@ def main():  # Main loop
             data = s.scrape(data)
             print(f"⚠️ Inserting {str(len(data))} matches... [{scraped_msg_count} in total]")
             timer_2 = time.perf_counter()
-            print(f"[Time Elapsed: {int(1000*(timer_2 - timer_1))}ms]")
+            print(f"[{int(1000*(timer_2 - timer_1))}ms]")
             col.insert_many(data, ordered=False)
             getOptions["after"] = data[0]["_id"]
         print("\n")
