@@ -96,6 +96,11 @@ class Scraper:
             embed_fields = match["embeds"][0]["fields"]
             match_type = embed_fields[len(embed_fields)-1]["value"]
             match_time = embed_fields[len(embed_fields)-2]["value"].replace(":clock10: ", '')
+            
+            try:
+                date = datetime.strptime(match["timestamp"], '%Y-%m-%dT%H:%M:%S+00:00')
+            except:
+                date = datetime.strptime(match["timestamp"], '%Y-%m-%dT%H:%M:%S.%f+00:00')
 
             match_type = {
                 "team": True if "Team" in match_type else False,
@@ -104,7 +109,7 @@ class Scraper:
 
             match_data = {
                 "_id": match["id"],
-                "date": datetime.strptime(match["timestamp"], '%Y-%m-%dT%H:%M:%S+00:00'),
+                "date": date,
                 "match_time": self.parse_time(match_time),
                 "match_type": match_type
             }
