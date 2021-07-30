@@ -125,6 +125,7 @@ class Scraper:
                 print("Type:", exception_type)
                 print("File name:", filename), 
                 print("Line number: ", line_number)
+                print(f"\n{e.__traceback__}")
                 sys.exit(1)
 
             parsed_matches.append(match_data)
