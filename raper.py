@@ -1,4 +1,3 @@
-from re import S
 import requests
 import json
 from pymongo import MongoClient
