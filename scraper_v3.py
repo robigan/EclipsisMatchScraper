@@ -2,9 +2,6 @@ from datetime import datetime   # Used for date / time conversions
 import regex
 
 class Scraper:
-    def __init__(self):
-        self.parsed_matches = []
-
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
         format_str = ""                 
         if "h" in time_str:
@@ -91,6 +88,7 @@ class Scraper:
             return teams
 
     def scrape(self, matches):
+        parsed_matches = []
         for match in matches:
             embed_fields = match["embeds"][0]["fields"]
             match_type = embed_fields[len(embed_fields)-1]["value"]
@@ -109,5 +107,5 @@ class Scraper:
             }
 
             match_data["teams"] = self.get_winners(match) + self.get_losers(match)
-            self.parsed_matches.append(match_data)
-        return self.parsed_matches
+            parsed_matches.append(match_data)
+        return parsed_matches
