@@ -35,6 +35,7 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
 
 
 def main():  # Main loop
+    scraped_msg_count = 0
     with open("/home/robigan/Documents/Source/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
         config = json.load(json_file)
         json_file.close()
@@ -57,16 +58,19 @@ def main():  # Main loop
     s = Scraper()
 
     while True:  # While loop to keep recursively updating the db
-        print("Scraping & raping")
+        print(chr(27) + "[2J") # clear terminal
+        print("Fetching data...")
         data = getData(config["url"], getOptions, config["headers"])
+        scraped_msg_count += str(len(data))
         # If the db contains the returned data, then exit
         if col.find_one({"_id": data[0]["id"]}) != None:
-            print("Database contains gotten data, exiting...")
+            print("❌ Database contains scraped data, exiting...")
             break
         else:
             # Scrape here the data, and then dump
+            print("Scraping data...")
             data = s.scrape(data)
-            print("Inserting " + str(len(data)) + " matches...")
+            print(f"⚠️ Inserting {str(len(data))} matches... [{scraped_msg_count} in total]")
             col.insert_many(data, ordered=False)
             getOptions["after"] = data[0]["_id"]
         print("\n")
