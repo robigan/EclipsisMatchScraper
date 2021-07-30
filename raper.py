@@ -21,14 +21,11 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
     while True:
         r = requests.get(
             url, params=getOptions, headers=headers)
-        if str(headers["authorization"]).startswith("Bot "): 
-            time.sleep(0.5)
-        else:
-            time.sleep(2.5)
+        time.sleep(2.5)
         decoded = r.json()
         if r.status_code == 429:
-            print("Getting ratelimited, ratelimit retry_after is " + str(decoded.retry_after))
-            time.sleep(decoded.retry_after + 5)
+            print("Getting ratelimited, ratelimit retry_after is " + str(decoded["retry_after"]))
+            time.sleep(decoded["retry_after"] + 5)
         else:
             data = shave(decoded)
             break
