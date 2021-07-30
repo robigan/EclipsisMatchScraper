@@ -1,5 +1,6 @@
 from datetime import datetime   # Used for date / time conversions
 import regex
+import sys
 
 class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
@@ -85,7 +86,7 @@ class Scraper:
                     except Exception as e:
                         print("Caught Exception: ", e)
                         print("Source: ", field)
-
+                        sys.exit(1)
 
                 team = {
                     "name":     field["name"].replace(":small_red_triangle_down: ", ''),
