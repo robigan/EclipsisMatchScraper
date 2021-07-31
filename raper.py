@@ -3,6 +3,7 @@ import json
 from pymongo import MongoClient
 import time
 from scraper_v3 import Scraper
+import os
 
 def shave(data):  # Trims returned data
     newData = []
@@ -33,7 +34,7 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
 
 def main():  # Main loop
     scraped_msg_count = 0
-    with open("/root/EclipsisMatchScraper/secret.hidden.json") as json_file:  # Get config file
+    with open(os.getcwd() + "/secret.hidden.json") as json_file:  # Get config file
         config = json.load(json_file)
         json_file.close()
 
