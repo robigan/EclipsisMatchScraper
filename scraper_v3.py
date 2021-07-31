@@ -1,6 +1,7 @@
 from datetime import datetime   # Used for date / time conversions
 import regex
 import sys
+import traceback
 
 class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
@@ -23,7 +24,7 @@ class Scraper:
         return regex.findall("(?<=:arrow_down: |:arrow_down_small: |:trophy::arrow_up_small: |:trophy::arrow_up: |:arrow_double_down: |:trophy::arrow_double_up: |:regional_indicator_o: ).*?(?= [[])", str(source))
 
     def get_playtimes(self, source):
-        return regex.findall("(?<=\w [[]).*?(?=[]])", str(source))
+        return regex.findall("(?<=[\w| ] [[]).*?(?=[]])", str(source))
     
     def get_ratings(self, source):
         return regex.findall("(?<=]: ).*?(?= [-+]|\W)", str(source)) 
@@ -89,7 +90,7 @@ class Scraper:
                     "players":  players
                 }
                 teams.append(team)
-            return teams
+        return teams
 
     def scrape(self, matches):
         parsed_matches = []
@@ -118,8 +119,15 @@ class Scraper:
                 match_data["teams"] = self.get_winners(match) + self.get_losers(match)
 
             except Exception as e:
-                print("Caught Exception: ", e)
-                print("Source: ", match)
+                exception_type, exception_object, exception_traceback = sys.exc_info()
+                filename = exception_traceback.tb_frame.f_code.co_filename
+                line_number = exception_traceback.tb_lineno
+                print("\nCaught Exception!\n")
+                print("Type:", exception_type)
+                print("File name:", filename), 
+                print("Line number: ", line_number, "\n")
+                print(traceback.format_exc())
+                print("\nMatch Data:", match), 
                 sys.exit(1)
 
             parsed_matches.append(match_data)
