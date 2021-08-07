@@ -47,25 +47,19 @@ class Scraper:
 
             player = {
                 "username":         usernames[i],
+                "team":             match["embeds"][0]["author"]["name"],
+                "won":              True,
                 "new_rating":       int(rating[i]) + rating_change[i],
                 "rating_change":    rating_change[i],
                 "playtime":         self.parse_time(playtimes[i])
             }
             players.append(player)
-
-        team = {
-            "name":     match["embeds"][0]["author"]["name"],
-            "won":      True,
-            "players":  players
-        }
-
-        return [team]
+        return players
 
     def get_losers(self, match):
-        teams = []
+        players = []
         for field in match["embeds"][0]["fields"]:
             if "small_red_triangle_down" in field["name"]:
-                players = []
                 rating_change = []
 
                 usernames = self.get_usernames(field)
@@ -78,19 +72,14 @@ class Scraper:
 
                     player = {
                         "username":         usernames[i],
+                        "team":             field["name"].replace(":small_red_triangle_down: ", ''),
+                        "won":              False,
                         "new_rating":       int(rating[i]) + rating_change[i],
                         "rating_change":    rating_change[i],
                         "playtime":         self.parse_time(playtimes[i])
                     }
                     players.append(player)
-
-                team = {
-                    "name":     field["name"].replace(":small_red_triangle_down: ", ''),
-                    "won":      False,
-                    "players":  players
-                }
-                teams.append(team)
-        return teams
+        return players
 
     def scrape(self, matches):
         parsed_matches = []
@@ -116,7 +105,7 @@ class Scraper:
                 "match_type": match_type
             }
             try:
-                match_data["teams"] = self.get_winners(match) + self.get_losers(match)
+                match_data["players"] = self.get_winners(match) + self.get_losers(match)
 
             except Exception as e:
                 exception_type, exception_object, exception_traceback = sys.exc_info()

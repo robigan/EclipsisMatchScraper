@@ -21,7 +21,7 @@ def getData(url, getOptions, headers):  # Gets a trimmed down version of the dat
     while True:
         r = requests.get(
             url, params=getOptions, headers=headers)
-        time.sleep(2.5)
+        time.sleep(0.4)
         decoded = r.json()
         if r.status_code == 429:
             print("Getting ratelimited, ratelimit retry_after is " + str(decoded["retry_after"]))
