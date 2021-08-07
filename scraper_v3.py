@@ -1,7 +1,9 @@
 from datetime import datetime   # Used for date / time conversions
+from concurrent.futures import ThreadPoolExecutor # Concurrent GET requests
 import regex
 import sys
 import traceback
+import requests
 
 class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
@@ -31,6 +33,31 @@ class Scraper:
 
     def get_delta_ratings(self, source):
         return regex.findall("(?<= )[-+]\d.*?(?=\\n|\W)", str(source))
+    
+    def get_url(self, url):
+        x = requests.get(url).json()
+        if "success" in x:
+            if x["errorMessage"] == "User not found":
+                print(f"❌ User doesn't exist! ({url})")
+                return -1
+            
+            else:  
+                print(f'❌ROBLOX API error: "{x["errorMessage"]}"')
+                print(url)
+    
+        return x["Id"]
+
+    def get_userids(self, usernames):
+        get_url = "https://api.roblox.com/users/get-by-username?username="
+        urls = []
+        
+        for username in usernames:
+            urls.append(get_url + username)
+
+        with ThreadPoolExecutor(max_workers=600) as pool:
+            response_list = list(pool.map(self.get_url, urls))
+
+        return response_list
 
     def get_winners(self, match):
         field = match["embeds"][0]["description"]
@@ -46,7 +73,7 @@ class Scraper:
             rating_change.append(int(delta_ratings[i]) if len(delta_ratings) > 0 else 0)
 
             player = {
-                "username":         usernames[i],
+                "id":         usernames[i],
                 "team":             match["embeds"][0]["author"]["name"],
                 "won":              True,
                 "new_rating":       int(rating[i]) + rating_change[i],
@@ -71,7 +98,7 @@ class Scraper:
                     rating_change.append(int(delta_ratings[i]) if len(delta_ratings) > 0 else 0)
 
                     player = {
-                        "username":         usernames[i],
+                        "id":         usernames[i],
                         "team":             field["name"].replace(":small_red_triangle_down: ", ''),
                         "won":              False,
                         "new_rating":       int(rating[i]) + rating_change[i],
@@ -82,6 +109,7 @@ class Scraper:
         return players
 
     def scrape(self, matches):
+        players = []
         parsed_matches = []
         for match in matches:
             embed_fields = match["embeds"][0]["fields"]
@@ -104,6 +132,7 @@ class Scraper:
                 "match_time": self.parse_time(match_time),
                 "match_type": match_type
             }
+
             try:
                 match_data["players"] = self.get_winners(match) + self.get_losers(match)
 
@@ -120,4 +149,21 @@ class Scraper:
                 sys.exit(1)
 
             parsed_matches.append(match_data)
+
+            for player in match_data["players"]:
+                players.append(player["id"])
+
+        userids = self.get_userids(players)
+
+        i = 0
+
+        print("Converting userIDs...")
+        for match in parsed_matches:
+            for player in match["players"]:
+                #print(f'{player["id"]}: {userids[i]}')
+                player["id"] = userids[i]
+                #print(player["id"])
+                #print(f"{i+1} out of {len(userids)}")
+                i += 1
+
         return parsed_matches
