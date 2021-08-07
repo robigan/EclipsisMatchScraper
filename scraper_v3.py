@@ -4,6 +4,7 @@ import regex
 import sys
 import traceback
 import requests
+import time
 
 class Scraper:
     def parse_time(self, time_str): # Converts playtime / match_time to seconds
@@ -35,17 +36,25 @@ class Scraper:
         return regex.findall("(?<= )[-+]\d.*?(?=\\n|\W)", str(source))
     
     def get_url(self, url):
-        x = requests.get(url).json()
-        if "success" in x:
-            if x["errorMessage"] == "User not found":
-                print(f"❌ User doesn't exist! ({url})")
-                return -1
-            
-            else:  
-                print(f'❌ROBLOX API error: "{x["errorMessage"]}"')
-                print(url)
-    
-        return x["Id"]
+        while True:
+            try:
+                x = requests.get(url).json()
+            except:
+                print(f"❌ Request error! ({url})")
+                time.sleep(0.5)
+                continue
+
+
+            if "success" in x:
+                if x["errorMessage"] == "User not found":
+                    print(f"❌ User doesn't exist! ({url})")
+                    return -1
+                
+                else:  
+                    print(f'❌ ROBLOX API error: "{x["errorMessage"]}"')
+                    print(url)
+        
+            return x["Id"]
 
     def get_userids(self, usernames):
         get_url = "https://api.roblox.com/users/get-by-username?username="
